@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: landstack_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://landadmin:landpassword@postgis:5432/landstack
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=land-stack-india-national-secure-secret-key-2026-super-secure
+    depends_on:
+      - postgis
+      - redis
+    volumes:
+      - ./storage:/app/storage
+
+  postgis:
+    image: postgis/postgis:15-3.3
+    container_name: landstack_postgis
+    environment:
+      - POSTGRES_USER=landadmin
+      - POSTGRES_PASSWORD=landpassword
+      - POSTGRES_DB=landstack
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: landstack_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgis_data:
+  redis_data:
